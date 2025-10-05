@@ -2,11 +2,6 @@ const checkLength = function (line, maxLength) {
   return line.length <= maxLength;
 };
 
-console.log('Тест функции checkLength');
-console.log(checkLength('проверяемая строка', 20));
-console.log(checkLength('проверяемая строка', 18));
-console.log(checkLength('проверяемая строка', 10));
-
 
 const isPalindrome = function (line) {
   const normalizedLine = line.replaceAll(' ', '').toLowerCase();
@@ -18,4 +13,4 @@ const isPalindrome = function (line) {
   return normalizedLine === reversedLine;
 };
 
-console.log(isPalindrome('Лёша на полке клопа нашёл '));
+
