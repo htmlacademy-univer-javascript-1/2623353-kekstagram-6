@@ -30,7 +30,7 @@ export function openBigPicture(photo) {
   caption.textContent = photo.description;
 
   commentsList.innerHTML = '';
-  photo.comments.forEach(comment => {
+  photo.comments.forEach((comment) => {
     commentsList.appendChild(createCommentElement(comment));
   });
 
