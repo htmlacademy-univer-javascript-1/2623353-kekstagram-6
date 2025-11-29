@@ -1,4 +1,4 @@
-import { photos } from './main.js';
+import { openBigPicture } from './big-picture.js';
 
 const template = document.querySelector('#picture');
 const container = document.querySelector('.pictures');
@@ -20,14 +20,19 @@ const createThumbnail = (photo) => {
   return thumb;
 };
 
-const renderThumbnails = () => {
+export function renderThumbnails(photos) {
   const fragment = document.createDocumentFragment();
+
   photos.forEach((photo) => {
     const thumb = createThumbnail(photo);
+
+    thumb.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      openBigPicture(photo);
+    });
+
     fragment.appendChild(thumb);
   });
 
   container.appendChild(fragment);
-};
-
-export { renderThumbnails };
+}

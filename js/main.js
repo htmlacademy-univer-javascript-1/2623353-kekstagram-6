@@ -4,7 +4,7 @@ import { renderThumbnails } from './thumbnails.js';
 const photos = generatePhotos();
 
 document.addEventListener('DOMContentLoaded', () => {
-  renderThumbnails();
+  renderThumbnails(photos);
 });
 
 export { photos };
