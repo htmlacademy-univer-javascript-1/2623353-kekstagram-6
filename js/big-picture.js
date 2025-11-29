@@ -10,6 +10,10 @@ const commentCountBlock = bigPicture.querySelector('.social__comment-count');
 const commentsLoader = bigPicture.querySelector('.comments-loader');
 const closeButton = bigPicture.querySelector('.big-picture__cancel');
 
+let currentComments = [];
+let shownCommentsCount = 0;
+const COMMENTS_PER_PAGE = 5;
+
 const createCommentElement = ({ avatar, name, message }) => {
   const li = document.createElement('li');
   li.classList.add('social__comment');
@@ -18,8 +22,25 @@ const createCommentElement = ({ avatar, name, message }) => {
     <img class="social__picture" src="${avatar}" alt="${name}" width="35" height="35">
     <p class="social__text">${message}</p>
   `;
-
   return li;
+};
+
+const renderComments = () => {
+  const nextCount = Math.min(shownCommentsCount + COMMENTS_PER_PAGE, currentComments.length);
+
+  for (let i = shownCommentsCount; i < nextCount; i++) {
+    commentsList.appendChild(createCommentElement(currentComments[i]));
+  }
+
+  commentCountBlock.textContent = `${nextCount} из ${currentComments.length} комментариев`;
+
+  shownCommentsCount = nextCount;
+
+  if (shownCommentsCount >= currentComments.length) {
+    commentsLoader.classList.add('hidden');
+  } else {
+    commentsLoader.classList.remove('hidden');
+  }
 };
 
 export function openBigPicture(photo) {
@@ -29,13 +50,14 @@ export function openBigPicture(photo) {
   commentsCount.textContent = photo.comments.length;
   caption.textContent = photo.description;
 
+  currentComments = photo.comments;
+  shownCommentsCount = 0;
   commentsList.innerHTML = '';
-  photo.comments.forEach((comment) => {
-    commentsList.appendChild(createCommentElement(comment));
-  });
 
-  commentCountBlock.classList.add('hidden');
-  commentsLoader.classList.add('hidden');
+  renderComments();
+
+  commentCountBlock.classList.remove('hidden');
+  commentsLoader.classList.remove('hidden');
 
   bigPicture.classList.remove('hidden');
   body.classList.add('modal-open');
@@ -57,3 +79,4 @@ function onEscKey(evt) {
 }
 
 closeButton.addEventListener('click', closeBigPicture);
+commentsLoader.addEventListener('click', () => renderComments());
