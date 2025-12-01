@@ -1,10 +1,9 @@
 import { generatePhotos } from './photo-generator.js';
 import { renderThumbnails } from './thumbnails.js';
+import './form.js';
 
 const photos = generatePhotos();
 
-document.addEventListener('DOMContentLoaded', () => {
-  renderThumbnails(photos);
-});
+renderThumbnails(photos);
 
 export { photos };
