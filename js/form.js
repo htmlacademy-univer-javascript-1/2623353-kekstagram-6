@@ -1,5 +1,6 @@
-// form.js
 import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
+
+let pristine;
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('.img-upload__form');
@@ -30,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     body.classList.remove('modal-open');
     form.reset();
     fileInput.value = '';
+
+    if (pristine) {
+      pristine.reset();
+    }
+
     document.removeEventListener('keydown', onDocumentEscKey);
   }
 
@@ -67,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const pristine = new Pristine(form, {
+  pristine = new Pristine(form, {
     classTo: 'img-upload__field-wrapper',
     errorClass: 'img-upload__field-wrapper--invalid',
     errorTextParent: 'img-upload__field-wrapper',
