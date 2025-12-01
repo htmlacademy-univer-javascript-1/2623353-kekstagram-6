@@ -149,3 +149,30 @@ form.addEventListener('submit', (evt) => {
 
   form.submit();
 });
+
+// form.js
+const form = document.querySelector('.img-upload__form');
+const fileInput = form.querySelector('#upload-file');
+const overlay = form.querySelector('.img-upload__overlay');
+const cancelButton = form.querySelector('#upload-cancel');
+const body = document.body;
+
+const hashtagsInput = form.querySelector('.text__hashtags');
+const commentInput = form.querySelector('.text__description');
+const submitButton = form.querySelector('.img-upload__submit');
+
+console.log('Элементы формы найдены:', {
+  form: !!form,
+  fileInput: !!fileInput,
+  overlay: !!overlay,
+  hashtagsInput: !!hashtagsInput,
+  commentInput: !!commentInput,
+  submitButton: !!submitButton
+});
+
+function openForm() {
+  console.log('Открытие формы');
+  overlay.classList.remove('hidden');
+  body.classList.add('modal-open');
+  document.addEventListener('keydown', onDocumentEscKey);
+}
