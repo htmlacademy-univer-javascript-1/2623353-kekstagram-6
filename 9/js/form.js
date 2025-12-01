@@ -1,6 +1,7 @@
 import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
 
 let pristine;
+let isFormOpen = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('.img-upload__form');
@@ -20,15 +21,34 @@ document.addEventListener('DOMContentLoaded', () => {
   form.method = 'POST';
   form.enctype = 'multipart/form-data';
 
+  function onDocumentEscKey(evt) {
+    if (!isFormOpen) {
+      return;
+    }
+
+    const isFocusInInput = document.activeElement === hashtagsInput ||
+                          document.activeElement === commentInput;
+
+    if (evt.key === 'Escape' && !isFocusInInput) {
+      evt.preventDefault();
+      evt.stopPropagation();
+      closeForm();
+    }
+  }
+
+  document.addEventListener('keydown', onDocumentEscKey);
+
   function openForm() {
     overlay.classList.remove('hidden');
     body.classList.add('modal-open');
-    document.addEventListener('keydown', onDocumentEscKey);
+    isFormOpen = true;
   }
 
   function closeForm() {
     overlay.classList.add('hidden');
     body.classList.remove('modal-open');
+    isFormOpen = false; // ← СБРАСЫВАЕМ ФЛАГ
+
     form.reset();
     fileInput.value = '';
 
@@ -36,13 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
       pristine.reset();
     }
 
-    document.removeEventListener('keydown', onDocumentEscKey);
-  }
-
-  function onDocumentEscKey(evt) {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      closeForm();
+    if (hashtagsInput) {
+      hashtagsInput.value = '';
+    }
+    if (commentInput) {
+      commentInput.value = '';
     }
   }
 
