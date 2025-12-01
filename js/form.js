@@ -8,22 +8,21 @@ const hashtagsInput = form.querySelector('.text__hashtags');
 const commentInput = form.querySelector('.text__description');
 const submitButton = form.querySelector('.img-upload__submit');
 
+form.action = 'https://29.javascript.htmlacademy.pro/kekstagram';
+form.method = 'POST';
+form.enctype = 'multipart/form-data';
 
 function openForm() {
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
-
   document.addEventListener('keydown', onDocumentEscKey);
 }
-
 
 function closeForm() {
   overlay.classList.add('hidden');
   body.classList.remove('modal-open');
-
   form.reset();
   fileInput.value = '';
-
   document.removeEventListener('keydown', onDocumentEscKey);
 }
 
@@ -34,15 +33,13 @@ function onDocumentEscKey(evt) {
   }
 }
 
-
 [hashtagsInput, commentInput].forEach((field) => {
   field.addEventListener('keydown', (evt) => {
     if (evt.key === 'Escape') {
-      evt.stopPropagation(); // блокируем закрытие формы
+      evt.stopPropagation();
     }
   });
 });
-
 
 fileInput.addEventListener('change', () => {
   if (fileInput.files.length > 0) {
@@ -50,12 +47,10 @@ fileInput.addEventListener('change', () => {
   }
 });
 
-
 cancelButton.addEventListener('click', (evt) => {
   evt.preventDefault();
   closeForm();
 });
-
 
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
@@ -63,7 +58,6 @@ const pristine = new Pristine(form, {
   errorTextParent: 'img-upload__field-wrapper',
   errorTextClass: 'img-upload__error'
 }, true);
-
 
 const MAX_HASHTAGS = 5;
 const MAX_HASHTAG_LENGTH = 20;
@@ -128,15 +122,13 @@ pristine.addValidator(
   hashtagsErrorMessage
 );
 
-
 pristine.addValidator(
   commentInput,
   (value) => value.length <= 140,
   'Комментарий не может быть длиннее 140 символов'
 );
 
-
-form.addEventListener('submit', (evt) => {
+form.addEventListener('submit', async (evt) => {
   evt.preventDefault();
 
   const isValid = pristine.validate();
@@ -146,33 +138,23 @@ form.addEventListener('submit', (evt) => {
   }
 
   submitButton.disabled = true;
+  const originalText = submitButton.textContent;
+  submitButton.textContent = 'Отправка...';
 
-  form.submit();
+  try {
+    const formData = new FormData(form);
+
+    await fetch(form.action, {
+      method: form.method,
+      body: formData
+    });
+
+    closeForm();
+
+  } catch {
+
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
 });
-
-// form.js
-const form = document.querySelector('.img-upload__form');
-const fileInput = form.querySelector('#upload-file');
-const overlay = form.querySelector('.img-upload__overlay');
-const cancelButton = form.querySelector('#upload-cancel');
-const body = document.body;
-
-const hashtagsInput = form.querySelector('.text__hashtags');
-const commentInput = form.querySelector('.text__description');
-const submitButton = form.querySelector('.img-upload__submit');
-
-console.log('Элементы формы найдены:', {
-  form: !!form,
-  fileInput: !!fileInput,
-  overlay: !!overlay,
-  hashtagsInput: !!hashtagsInput,
-  commentInput: !!commentInput,
-  submitButton: !!submitButton
-});
-
-function openForm() {
-  console.log('Открытие формы');
-  overlay.classList.remove('hidden');
-  body.classList.add('modal-open');
-  document.addEventListener('keydown', onDocumentEscKey);
-}
