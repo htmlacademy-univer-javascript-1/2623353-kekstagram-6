@@ -151,8 +151,8 @@ form.addEventListener('submit', async (evt) => {
 
     closeForm();
 
-  } catch {
-
+  } catch (error) {
+    // Игнорируем ошибки
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = originalText;
