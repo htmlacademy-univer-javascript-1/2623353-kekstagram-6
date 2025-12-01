@@ -1,25 +1,119 @@
+// form.js
+import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('.img-upload__form');
+  const fileInput = document.querySelector('#upload-file');
+  const overlay = document.querySelector('.img-upload__overlay');
+  const cancelButton = document.querySelector('#upload-cancel');
+  const body = document.body;
+  const hashtagsInput = form.querySelector('.text__hashtags');
+  const commentInput = form.querySelector('.text__description');
+  const submitButton = form.querySelector('.img-upload__submit');
 
-  const testButton = document.createElement('button');
-  testButton.textContent = 'ТЕСТ: Открыть форму';
-  testButton.style.position = 'fixed';
-  testButton.style.top = '10px';
-  testButton.style.left = '10px';
-  testButton.style.zIndex = '9999';
-  document.body.appendChild(testButton);
+  if (!form || !fileInput || !overlay) {
+    return;
+  }
 
-  testButton.addEventListener('click', () => {
-    console.log('Тестовая кнопка нажата');
-    const overlay = document.querySelector('.img-upload__overlay');
-    if (overlay) {
-      console.log('Overlay найден, удаляю класс hidden');
-      overlay.classList.remove('hidden');
-      console.log('Теперь классы overlay:', overlay.classList);
-    } else {
-      console.error('Overlay не найден!');
+  form.action = 'https://29.javascript.htmlacademy.pro/kekstagram';
+  form.method = 'POST';
+  form.enctype = 'multipart/form-data';
+
+  function openForm() {
+    overlay.classList.remove('hidden');
+    body.classList.add('modal-open');
+    document.addEventListener('keydown', onDocumentEscKey);
+  }
+
+  function closeForm() {
+    overlay.classList.add('hidden');
+    body.classList.remove('modal-open');
+    form.reset();
+    fileInput.value = '';
+    document.removeEventListener('keydown', onDocumentEscKey);
+  }
+
+  function onDocumentEscKey(evt) {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      closeForm();
+    }
+  }
+
+  if (hashtagsInput && commentInput) {
+    [hashtagsInput, commentInput].forEach((field) => {
+      field.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Escape') {
+          evt.stopPropagation();
+        }
+      });
+    });
+  }
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      openForm();
     }
   });
 
-  console.log('Тестовая кнопка добавлена');
+  if (cancelButton) {
+    cancelButton.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      closeForm();
+    });
+  }
+
+  if (typeof Pristine === 'undefined') {
+    return;
+  }
+
+  const pristine = new Pristine(form, {
+    classTo: 'img-upload__field-wrapper',
+    errorClass: 'img-upload__field-wrapper--invalid',
+    errorTextParent: 'img-upload__field-wrapper',
+    errorTextClass: 'img-upload__error'
+  }, true);
+
+  pristine.addValidator(
+    hashtagsInput,
+    validateHashtags,
+    getHashtagErrorMessage
+  );
+
+  pristine.addValidator(
+    commentInput,
+    (value) => value.length <= 140,
+    'Комментарий не может быть длиннее 140 символов'
+  );
+
+  form.addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+
+    const isValid = pristine.validate();
+
+    if (!isValid) {
+      return;
+    }
+
+    submitButton.disabled = true;
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Отправка...';
+
+    try {
+      const formData = new FormData(form);
+
+      await fetch(form.action, {
+        method: form.method,
+        body: formData
+      });
+
+      closeForm();
+
+    } catch (error) {
+      // Игнорируем ошибки
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    }
+  });
 });

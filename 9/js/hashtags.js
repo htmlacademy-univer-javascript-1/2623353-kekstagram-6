@@ -1,4 +1,3 @@
-// hashtags.js
 const MAX_HASHTAGS = 5;
 const MAX_HASHTAG_LENGTH = 20;
 const HASHTAG_REGEX = /^#[a-zа-яё0-9]+$/i;
