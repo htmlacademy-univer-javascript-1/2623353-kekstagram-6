@@ -106,9 +106,17 @@ function hashtagsErrorMessage(value) {
   }
 
   for (const tag of tags) {
-    if (tag === '#') return 'Хэш-тег не может состоять из одной решётки';
-    if (!HASHTAG_REGEX.test(tag)) return 'Неверный формат хэш-тега';
-    if (tag.length > MAX_HASHTAG_LENGTH) return 'Максимальная длина 20 символов';
+    if (tag === '#') {
+      return 'Хэш-тег не может состоять из одной решётки';
+    }
+
+    if (!HASHTAG_REGEX.test(tag)) {
+      return 'Неверный формат хэш-тега';
+    }
+
+    if (tag.length > MAX_HASHTAG_LENGTH) {
+      return 'Максимальная длина 20 символов';
+    }
   }
 
   return 'Ошибка в хэш-тегах';
