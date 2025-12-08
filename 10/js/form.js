@@ -1,5 +1,5 @@
 import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
-import { initScaleAndEffects, resetScaleAndEffects } from './scale-effects.js';
+import { initScaleAndEffects, resetScaleAndEffects } from './scale-and-effects.js';
 
 let pristine;
 let isFormOpen = false;
