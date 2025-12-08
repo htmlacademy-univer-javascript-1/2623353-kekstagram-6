@@ -1,5 +1,5 @@
 import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
-import { initScaleAndEffects, resetScaleAndEffects } from './scale-and-effects.js';
+import { initScale, resetScale } from './scale.js';
 
 let pristine;
 let isFormOpen = false;
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     body.classList.add('modal-open');
     isFormOpen = true;
 
-    initScaleAndEffects();
+    initScale();
   }
 
   function closeForm() {
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     body.classList.remove('modal-open');
     isFormOpen = false;
 
-    resetScaleAndEffects();
+    resetScale();
 
     form.reset();
     fileInput.value = '';
