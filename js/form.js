@@ -1,4 +1,6 @@
 import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
+import { initScale, resetScale } from './scale.js';
+import { initEffects, resetEffects } from './effects.js';
 
 let pristine;
 let isFormOpen = false;
@@ -42,12 +44,20 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.classList.remove('hidden');
     body.classList.add('modal-open');
     isFormOpen = true;
+
+    setTimeout(() => {
+      initScale();
+      initEffects();
+    }, 10);
   }
 
   function closeForm() {
     overlay.classList.add('hidden');
     body.classList.remove('modal-open');
-    isFormOpen = false; // ← СБРАСЫВАЕМ ФЛАГ
+    isFormOpen = false;
+
+    resetScale();
+    resetEffects();
 
     form.reset();
     fileInput.value = '';
