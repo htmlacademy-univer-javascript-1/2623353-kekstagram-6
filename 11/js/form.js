@@ -58,18 +58,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const button = messageElement.querySelector('.success__button, .error__button');
       if (button) {
-        button.onclick = closeMessage;
+        button.onclick = (evt) => {
+          evt.stopPropagation();
+          closeMessage();
+        };
       }
 
       currentMessageDocumentClick = (evt) => {
-        if (currentMessageElement && !currentMessageElement.contains(evt.target)) {
+        const clickedElement = evt.target;
+        const isClickInsideMessage = currentMessageElement === clickedElement ||
+                                  currentMessageElement.contains(clickedElement);
+
+        if (!isClickInsideMessage) {
           closeMessage();
         }
       };
 
       setTimeout(() => {
         document.addEventListener('click', currentMessageDocumentClick);
-      }, 0);
+      }, 10);
 
       document.addEventListener('keydown', onMessageKeydown);
     }
