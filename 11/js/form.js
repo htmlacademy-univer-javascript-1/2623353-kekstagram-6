@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const button = messageElement.querySelector('.success__button, .error__button');
       if (button) {
-        button.addEventListener('click', closeMessage);
+        button.onclick = closeMessage;
       }
 
       currentMessageDocumentClick = (evt) => {
@@ -67,7 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      document.addEventListener('click', currentMessageDocumentClick);
+      setTimeout(() => {
+        document.addEventListener('click', currentMessageDocumentClick);
+      }, 0);
+
       document.addEventListener('keydown', onMessageKeydown);
     }
   }
