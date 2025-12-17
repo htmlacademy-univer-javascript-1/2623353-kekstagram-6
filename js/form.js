@@ -23,14 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const successTemplate = document.querySelector('#success');
   const errorTemplate = document.querySelector('#error');
 
-  let currentMessage = null;
+  let currentMessageElement = null;
+  let currentMessageDocumentClick = null;
 
   function closeMessage() {
-    if (currentMessage) {
-      currentMessage.remove();
-      currentMessage = null;
+    if (currentMessageElement) {
+      currentMessageElement.remove();
+      currentMessageElement = null;
       document.removeEventListener('keydown', onMessageKeydown);
-      document.removeEventListener('click', onMessageClick);
+
+      if (currentMessageDocumentClick) {
+        document.removeEventListener('click', currentMessageDocumentClick);
+        currentMessageDocumentClick = null;
+      }
     }
   }
 
@@ -41,29 +46,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function onMessageClick(evt) {
-    if (!evt.target.closest('.success__inner') && !evt.target.closest('.error__inner')) {
-      closeMessage();
-    }
-  }
-
   function showMessage(template) {
-    currentMessage = template.content.cloneNode(true);
-    document.body.appendChild(currentMessage);
+    closeMessage();
 
-    const successElement = document.querySelector('.success');
-    const errorElement = document.querySelector('.error');
-    const messageElement = successElement || errorElement;
+    const messageContent = template.content.cloneNode(true);
+    const messageElement = messageContent.querySelector('.success, .error');
 
     if (messageElement) {
+      document.body.appendChild(messageContent);
+      currentMessageElement = messageElement;
+
       const button = messageElement.querySelector('.success__button, .error__button');
       if (button) {
         button.addEventListener('click', closeMessage);
       }
-    }
 
-    document.addEventListener('keydown', onMessageKeydown);
-    document.addEventListener('click', onMessageClick);
+      currentMessageDocumentClick = (evt) => {
+        if (!messageElement.contains(evt.target)) {
+          closeMessage();
+        }
+      };
+
+      setTimeout(() => {
+        document.addEventListener('click', currentMessageDocumentClick);
+      }, 0);
+
+      document.addEventListener('keydown', onMessageKeydown);
+    }
   }
 
   function onDocumentEscKey(evt) {
