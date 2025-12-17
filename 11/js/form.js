@@ -51,9 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
     currentMessage = template.content.cloneNode(true);
     document.body.appendChild(currentMessage);
 
-    const button = document.querySelector('.success__button, .error__button');
-    if (button) {
-      button.addEventListener('click', closeMessage);
+    const successElement = document.querySelector('.success');
+    const errorElement = document.querySelector('.error');
+    const messageElement = successElement || errorElement;
+
+    if (messageElement) {
+      const button = messageElement.querySelector('.success__button, .error__button');
+      if (button) {
+        button.addEventListener('click', closeMessage);
+      }
     }
 
     document.addEventListener('keydown', onMessageKeydown);
