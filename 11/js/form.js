@@ -67,12 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       currentMessageDocumentClick = (evt) => {
-        if (body.classList.contains('has-message') &&
-            currentMessageElement &&
-            !currentMessageElement.contains(evt.target)) {
+        if (evt.target === currentMessageElement) {
           closeMessage();
         }
       };
+
 
       document.addEventListener('click', currentMessageDocumentClick);
       document.addEventListener('keydown', onMessageKeydown);
