@@ -25,29 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentMessage = null;
 
-  const closeMessage = () => {
+  function closeMessage() {
     if (currentMessage) {
       currentMessage.remove();
       currentMessage = null;
       document.removeEventListener('keydown', onMessageKeydown);
       document.removeEventListener('click', onMessageClick);
     }
-  };
+  }
 
-  const onMessageKeydown = (evt) => {
+  function onMessageKeydown(evt) {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       closeMessage();
     }
-  };
+  }
 
-  const onMessageClick = (evt) => {
+  function onMessageClick(evt) {
     if (!evt.target.closest('.success__inner') && !evt.target.closest('.error__inner')) {
       closeMessage();
     }
-  };
+  }
 
-  const showMessage = (template) => {
+  function showMessage(template) {
     currentMessage = template.content.cloneNode(true);
     document.body.appendChild(currentMessage);
 
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', onMessageKeydown);
     document.addEventListener('click', onMessageClick);
-  };
+  }
 
   function onDocumentEscKey(evt) {
     if (!isFormOpen) {
