@@ -1,6 +1,7 @@
 import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
 import { initScale, resetScale } from './scale.js';
 import { initEffects, resetEffects } from './effects.js';
+import { sendData } from './api.js';
 
 let pristine;
 let isFormOpen = false;
@@ -19,9 +20,45 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  form.action = 'https://29.javascript.htmlacademy.pro/kekstagram';
-  form.method = 'POST';
-  form.enctype = 'multipart/form-data';
+  const successTemplate = document.querySelector('#success');
+  const errorTemplate = document.querySelector('#error');
+
+  let currentMessage = null;
+
+  const closeMessage = () => {
+    if (currentMessage) {
+      currentMessage.remove();
+      currentMessage = null;
+      document.removeEventListener('keydown', onMessageKeydown);
+      document.removeEventListener('click', onMessageClick);
+    }
+  };
+
+  const onMessageKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      closeMessage();
+    }
+  };
+
+  const onMessageClick = (evt) => {
+    if (!evt.target.closest('.success__inner') && !evt.target.closest('.error__inner')) {
+      closeMessage();
+    }
+  };
+
+  const showMessage = (template) => {
+    currentMessage = template.content.cloneNode(true);
+    document.body.appendChild(currentMessage);
+
+    const button = document.querySelector('.success__button, .error__button');
+    if (button) {
+      button.addEventListener('click', closeMessage);
+    }
+
+    document.addEventListener('keydown', onMessageKeydown);
+    document.addEventListener('click', onMessageClick);
+  };
 
   function onDocumentEscKey(evt) {
     if (!isFormOpen) {
@@ -74,6 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function resetForm() {
+    closeForm();
+  }
+
   if (hashtagsInput && commentInput) {
     [hashtagsInput, commentInput].forEach((field) => {
       field.addEventListener('keydown', (evt) => {
@@ -93,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (cancelButton) {
     cancelButton.addEventListener('click', (evt) => {
       evt.preventDefault();
-      closeForm();
+      resetForm();
     });
   }
 
@@ -129,22 +170,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    submitButton.disabled = true;
     const originalText = submitButton.textContent;
+    submitButton.disabled = true;
     submitButton.textContent = 'Отправка...';
 
     try {
       const formData = new FormData(form);
+      await sendData(formData);
 
-      await fetch(form.action, {
-        method: form.method,
-        body: formData
-      });
-
-      closeForm();
-
+      resetForm();
+      showMessage(successTemplate);
     } catch (error) {
-      // Игнорируем ошибки
+      showMessage(errorTemplate);
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = originalText;
