@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const body = document.body;
   const hashtagsInput = form.querySelector('.text__hashtags');
   const commentInput = form.querySelector('.text__description');
-  const submitButton = form.querySelector('.img-upload__submit');
+  const submitButton = document.querySelector('.img-upload__submit');
 
   if (!form || !fileInput || !overlay) {
     return;
@@ -62,15 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       currentMessageDocumentClick = (evt) => {
-        if (!messageElement.contains(evt.target)) {
+        if (currentMessageElement && !currentMessageElement.contains(evt.target)) {
           closeMessage();
         }
       };
 
-      setTimeout(() => {
-        document.addEventListener('click', currentMessageDocumentClick);
-      }, 0);
-
+      document.addEventListener('click', currentMessageDocumentClick);
       document.addEventListener('keydown', onMessageKeydown);
     }
   }
