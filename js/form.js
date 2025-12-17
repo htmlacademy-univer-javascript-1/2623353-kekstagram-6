@@ -30,6 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentMessageElement) {
       currentMessageElement.remove();
       currentMessageElement = null;
+
+      body.classList.remove('has-message');
+
       document.removeEventListener('keydown', onMessageKeydown);
 
       if (currentMessageDocumentClick) {
@@ -56,28 +59,22 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.appendChild(messageContent);
       currentMessageElement = messageElement;
 
+      body.classList.add('has-message');
+
       const button = messageElement.querySelector('.success__button, .error__button');
       if (button) {
-        button.onclick = (evt) => {
-          evt.stopPropagation();
-          closeMessage();
-        };
+        button.onclick = () => closeMessage();
       }
 
       currentMessageDocumentClick = (evt) => {
-        const clickedElement = evt.target;
-        const isClickInsideMessage = currentMessageElement === clickedElement ||
-                                  currentMessageElement.contains(clickedElement);
-
-        if (!isClickInsideMessage) {
+        if (body.classList.contains('has-message') &&
+            currentMessageElement &&
+            !currentMessageElement.contains(evt.target)) {
           closeMessage();
         }
       };
 
-      setTimeout(() => {
-        document.addEventListener('click', currentMessageDocumentClick);
-      }, 10);
-
+      document.addEventListener('click', currentMessageDocumentClick);
       document.addEventListener('keydown', onMessageKeydown);
     }
   }
