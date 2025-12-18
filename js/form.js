@@ -12,9 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.querySelector('.img-upload__overlay');
   const cancelButton = document.querySelector('#upload-cancel');
   const body = document.body;
+
   const hashtagsInput = form.querySelector('.text__hashtags');
   const commentInput = form.querySelector('.text__description');
   const submitButton = document.querySelector('.img-upload__submit');
+
+  const previewImage = overlay.querySelector('.img-upload__preview img');
+  const effectPreviews = overlay.querySelectorAll('.effects__preview');
+
+  const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
   if (!form || !fileInput || !overlay) {
     return;
@@ -30,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentMessageElement) {
       currentMessageElement.remove();
       currentMessageElement = null;
-
       body.classList.remove('has-message');
 
       document.removeEventListener('keydown', onMessageKeydown);
@@ -55,27 +60,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageContent = template.content.cloneNode(true);
     const messageElement = messageContent.querySelector('.success, .error');
 
-    if (messageElement) {
-      document.body.appendChild(messageContent);
-      currentMessageElement = messageElement;
-
-      body.classList.add('has-message');
-
-      const button = messageElement.querySelector('.success__button, .error__button');
-      if (button) {
-        button.onclick = () => closeMessage();
-      }
-
-      currentMessageDocumentClick = (evt) => {
-        if (evt.target === currentMessageElement) {
-          closeMessage();
-        }
-      };
-
-
-      document.addEventListener('click', currentMessageDocumentClick);
-      document.addEventListener('keydown', onMessageKeydown);
+    if (!messageElement) {
+      return;
     }
+
+    document.body.appendChild(messageContent);
+    currentMessageElement = messageElement;
+    body.classList.add('has-message');
+
+    const button = messageElement.querySelector('.success__button, .error__button');
+    if (button) {
+      button.addEventListener('click', closeMessage);
+    }
+
+    currentMessageDocumentClick = (evt) => {
+      if (evt.target === currentMessageElement) {
+        closeMessage();
+      }
+    };
+
+    document.addEventListener('click', currentMessageDocumentClick);
+    document.addEventListener('keydown', onMessageKeydown);
   }
 
   function onDocumentEscKey(evt) {
@@ -83,12 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const isFocusInInput = document.activeElement === hashtagsInput ||
-                          document.activeElement === commentInput;
+    const isFocusInInput =
+      document.activeElement === hashtagsInput ||
+      document.activeElement === commentInput;
 
     if (evt.key === 'Escape' && !isFocusInInput) {
       evt.preventDefault();
-      evt.stopPropagation();
       closeForm();
     }
   }
@@ -100,10 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
     body.classList.add('modal-open');
     isFormOpen = true;
 
-    setTimeout(() => {
-      initScale();
-      initEffects();
-    }, 10);
+    initScale();
+    initEffects();
   }
 
   function closeForm() {
@@ -120,17 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pristine) {
       pristine.reset();
     }
-
-    if (hashtagsInput) {
-      hashtagsInput.value = '';
-    }
-    if (commentInput) {
-      commentInput.value = '';
-    }
-  }
-
-  function resetForm() {
-    closeForm();
   }
 
   if (hashtagsInput && commentInput) {
@@ -144,17 +136,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   fileInput.addEventListener('change', () => {
-    if (fileInput.files.length > 0) {
-      openForm();
+    const file = fileInput.files[0];
+
+    if (!file) {
+      return;
     }
+
+    const fileName = file.name.toLowerCase();
+    const isValidType = FILE_TYPES.some((type) =>
+      fileName.endsWith(type)
+    );
+
+    if (!isValidType) {
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+
+    previewImage.src = imageUrl;
+
+    effectPreviews.forEach((preview) => {
+      preview.style.backgroundImage = `url(${imageUrl})`;
+    });
+
+    openForm();
   });
 
-  if (cancelButton) {
-    cancelButton.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      resetForm();
-    });
-  }
+  cancelButton.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    closeForm();
+  });
 
   if (typeof Pristine === 'undefined') {
     return;
@@ -182,9 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (evt) => {
     evt.preventDefault();
 
-    const isValid = pristine.validate();
-
-    if (!isValid) {
+    if (!pristine.validate()) {
       return;
     }
 
@@ -196,9 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(form);
       await sendData(formData);
 
-      resetForm();
+      closeForm();
       showMessage(successTemplate);
-    } catch (error) {
+    } catch (error){
       showMessage(errorTemplate);
     } finally {
       submitButton.disabled = false;
