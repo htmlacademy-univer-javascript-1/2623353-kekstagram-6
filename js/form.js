@@ -1,6 +1,7 @@
 import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
 import { initScale, resetScale } from './scale.js';
 import { initEffects, resetEffects } from './effects.js';
+import { sendData } from './api.js';
 
 let pristine;
 let isFormOpen = false;
@@ -13,15 +14,69 @@ document.addEventListener('DOMContentLoaded', () => {
   const body = document.body;
   const hashtagsInput = form.querySelector('.text__hashtags');
   const commentInput = form.querySelector('.text__description');
-  const submitButton = form.querySelector('.img-upload__submit');
+  const submitButton = document.querySelector('.img-upload__submit');
 
   if (!form || !fileInput || !overlay) {
     return;
   }
 
-  form.action = 'https://29.javascript.htmlacademy.pro/kekstagram';
-  form.method = 'POST';
-  form.enctype = 'multipart/form-data';
+  const successTemplate = document.querySelector('#success');
+  const errorTemplate = document.querySelector('#error');
+
+  let currentMessageElement = null;
+  let currentMessageDocumentClick = null;
+
+  function closeMessage() {
+    if (currentMessageElement) {
+      currentMessageElement.remove();
+      currentMessageElement = null;
+
+      body.classList.remove('has-message');
+
+      document.removeEventListener('keydown', onMessageKeydown);
+
+      if (currentMessageDocumentClick) {
+        document.removeEventListener('click', currentMessageDocumentClick);
+        currentMessageDocumentClick = null;
+      }
+    }
+  }
+
+  function onMessageKeydown(evt) {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      closeMessage();
+    }
+  }
+
+  function showMessage(template) {
+    closeMessage();
+
+    const messageContent = template.content.cloneNode(true);
+    const messageElement = messageContent.querySelector('.success, .error');
+
+    if (messageElement) {
+      document.body.appendChild(messageContent);
+      currentMessageElement = messageElement;
+
+      body.classList.add('has-message');
+
+      const button = messageElement.querySelector('.success__button, .error__button');
+      if (button) {
+        button.onclick = () => closeMessage();
+      }
+
+      currentMessageDocumentClick = (evt) => {
+        if (evt.target === currentMessageElement) {
+          closeMessage();
+        }
+      };
+
+
+      document.addEventListener('click', currentMessageDocumentClick);
+      document.addEventListener('keydown', onMessageKeydown);
+    }
+  }
 
   function onDocumentEscKey(evt) {
     if (!isFormOpen) {
@@ -74,6 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function resetForm() {
+    closeForm();
+  }
+
   if (hashtagsInput && commentInput) {
     [hashtagsInput, commentInput].forEach((field) => {
       field.addEventListener('keydown', (evt) => {
@@ -93,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (cancelButton) {
     cancelButton.addEventListener('click', (evt) => {
       evt.preventDefault();
-      closeForm();
+      resetForm();
     });
   }
 
@@ -129,22 +188,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    submitButton.disabled = true;
     const originalText = submitButton.textContent;
+    submitButton.disabled = true;
     submitButton.textContent = 'Отправка...';
 
     try {
       const formData = new FormData(form);
+      await sendData(formData);
 
-      await fetch(form.action, {
-        method: form.method,
-        body: formData
-      });
-
-      closeForm();
-
+      resetForm();
+      showMessage(successTemplate);
     } catch (error) {
-      // Игнорируем ошибки
+      showMessage(errorTemplate);
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = originalText;
