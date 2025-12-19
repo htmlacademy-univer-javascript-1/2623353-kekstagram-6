@@ -16,7 +16,6 @@ const sendData = (body) =>
     if (!response.ok) {
       throw new Error();
     }
-    return response;
   });
 
 export { getData, sendData };

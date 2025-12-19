@@ -46,8 +46,8 @@ const renderComments = () => {
 
   shownCommentsCount = nextCount;
 
-  commentCountBlock.textContent =
-  `${shownCommentsCount} из ${currentComments.length} комментариев`;
+  commentCountBlock.firstChild.textContent =
+    `${shownCommentsCount} из `;
 
   totalCommentsCount.textContent = currentComments.length;
 
@@ -70,10 +70,7 @@ export function openBigPicture(photo) {
   commentsList.innerHTML = '';
 
   totalCommentsCount.textContent = currentComments.length;
-  renderComments();
-
   commentsLoader.classList.remove('hidden');
-
   renderComments();
 
   bigPicture.classList.remove('hidden');

@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       closeForm();
       showMessage(successTemplate);
-    } catch (error){
+    } catch (error) {
       showMessage(errorTemplate);
     } finally {
       submitButton.disabled = false;
