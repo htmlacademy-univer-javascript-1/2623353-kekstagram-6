@@ -8,13 +8,15 @@ const getData = () => fetch(`${BASE_URL}/data`)
     return response.json();
   });
 
-const sendData = (body) => fetch(BASE_URL, {
-  method: 'POST',
-  body,
-}).then((response) => {
-  if (!response.ok) {
-    throw new Error();
-  }
-});
+const sendData = (body) =>
+  fetch(BASE_URL, {
+    method: 'POST',
+    body,
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error();
+    }
+    return response;
+  });
 
 export { getData, sendData };
