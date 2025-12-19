@@ -3,16 +3,19 @@ const body = document.body;
 
 const imgElement = bigPicture.querySelector('.big-picture__img img');
 const likesCount = bigPicture.querySelector('.likes-count');
-const commentsCount = bigPicture.querySelector('.comments-count');
 const caption = bigPicture.querySelector('.social__caption');
 const commentsList = bigPicture.querySelector('.social__comments');
-const commentCountBlock = bigPicture.querySelector('.social__comment-count');
+
+const shownCommentsCountElement = bigPicture.querySelector('.social__comment-shown-count');
+const totalCommentsCountElement = bigPicture.querySelector('.social__comment-total-count');
+
 const commentsLoader = bigPicture.querySelector('.comments-loader');
 const closeButton = bigPicture.querySelector('.big-picture__cancel');
 
+const COMMENTS_PER_PAGE = 5;
+
 let currentComments = [];
 let shownCommentsCount = 0;
-const COMMENTS_PER_PAGE = 5;
 
 const createCommentElement = ({ avatar, name, message }) => {
   const li = document.createElement('li');
@@ -34,15 +37,19 @@ const createCommentElement = ({ avatar, name, message }) => {
 };
 
 const renderComments = () => {
-  const nextCount = Math.min(shownCommentsCount + COMMENTS_PER_PAGE, currentComments.length);
+  const nextCount = Math.min(
+    shownCommentsCount + COMMENTS_PER_PAGE,
+    currentComments.length
+  );
 
   for (let i = shownCommentsCount; i < nextCount; i++) {
     commentsList.appendChild(createCommentElement(currentComments[i]));
   }
 
-  commentCountBlock.textContent = `${nextCount} из ${currentComments.length} комментариев`;
-
   shownCommentsCount = nextCount;
+
+  shownCommentsCountElement.textContent = shownCommentsCount;
+  totalCommentsCountElement.textContent = currentComments.length;
 
   if (shownCommentsCount >= currentComments.length) {
     commentsLoader.classList.add('hidden');
@@ -55,17 +62,22 @@ export function openBigPicture(photo) {
   imgElement.src = photo.url;
   imgElement.alt = photo.description;
   likesCount.textContent = photo.likes;
-  commentsCount.textContent = photo.comments.length;
   caption.textContent = photo.description;
 
   currentComments = photo.comments;
   shownCommentsCount = 0;
+
   commentsList.innerHTML = '';
 
-  renderComments();
+  totalCommentsCountElement.textContent = currentComments.length;
+  shownCommentsCountElement.textContent = Math.min(
+    COMMENTS_PER_PAGE,
+    currentComments.length
+  );
 
-  commentCountBlock.classList.remove('hidden');
   commentsLoader.classList.remove('hidden');
+
+  renderComments();
 
   bigPicture.classList.remove('hidden');
   body.classList.add('modal-open');
@@ -76,6 +88,7 @@ export function openBigPicture(photo) {
 export function closeBigPicture() {
   bigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
+
   document.removeEventListener('keydown', onEscKey);
 }
 
@@ -87,4 +100,4 @@ function onEscKey(evt) {
 }
 
 closeButton.addEventListener('click', closeBigPicture);
-commentsLoader.addEventListener('click', () => renderComments());
+commentsLoader.addEventListener('click', renderComments);
