@@ -5,25 +5,20 @@ const DEFAULT_SCALE = 100;
 
 let currentScale = DEFAULT_SCALE;
 
-function getScaleElements() {
-  return {
-    scaleControl: document.querySelector('.scale__control--value'),
-    scaleSmaller: document.querySelector('.scale__control--smaller'),
-    scaleBigger: document.querySelector('.scale__control--bigger'),
-    previewImage: document.querySelector('.img-upload__preview img')
-  };
-}
+const scaleControl = document.querySelector('.scale__control--value');
+const scaleSmaller = document.querySelector('.scale__control--smaller');
+const scaleBigger = document.querySelector('.scale__control--bigger');
+const previewImage = document.querySelector('.img-upload__preview img');
 
 function updateScale(value) {
   currentScale = value;
-  const elements = getScaleElements();
 
-  if (elements.scaleControl) {
-    elements.scaleControl.value = `${value}%`;
+  if (scaleControl) {
+    scaleControl.value = `${value}%`;
   }
 
-  if (elements.previewImage) {
-    elements.previewImage.style.transform = `scale(${value / 100})`;
+  if (previewImage) {
+    previewImage.style.transform = `scale(${value / 100})`;
   }
 }
 
@@ -43,23 +38,17 @@ function onScaleBiggerClick() {
   updateScale(newScale);
 }
 
-function addScaleListeners() {
-  const elements = getScaleElements();
-
-  if (elements.scaleSmaller) {
-    elements.scaleSmaller.addEventListener('click', onScaleSmallerClick);
-  }
-
-  if (elements.scaleBigger) {
-    elements.scaleBigger.addEventListener('click', onScaleBiggerClick);
-  }
-}
-
 export function resetScale() {
   updateScale(DEFAULT_SCALE);
 }
 
 export function initScale() {
+  if (!scaleControl || !scaleSmaller || !scaleBigger || !previewImage) {
+    return;
+  }
+
   updateScale(DEFAULT_SCALE);
-  addScaleListeners();
+
+  scaleSmaller.addEventListener('click', onScaleSmallerClick);
+  scaleBigger.addEventListener('click', onScaleBiggerClick);
 }

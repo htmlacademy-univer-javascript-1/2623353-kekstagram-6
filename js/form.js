@@ -98,12 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  document.addEventListener('keydown', onDocumentEscKey);
 
   function openForm() {
     overlay.classList.remove('hidden');
     body.classList.add('modal-open');
     isFormOpen = true;
+
+    document.addEventListener('keydown', onDocumentEscKey);
 
     initScale();
     initEffects();
@@ -113,6 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.classList.add('hidden');
     body.classList.remove('modal-open');
     isFormOpen = false;
+
+    document.removeEventListener('keydown', onDocumentEscKey);
 
     resetScale();
     resetEffects();
