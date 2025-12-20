@@ -1,13 +1,23 @@
 const BASE_URL = 'https://29.javascript.htmlacademy.pro/kekstagram';
 
 const getData = () =>
-  fetch(`${BASE_URL}/data`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error();
+  new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+    xhr.open('GET', `${BASE_URL}/data`);
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        resolve(xhr.response);
+      } else {
+        reject();
       }
-      return response.json();
-    });
+    };
+
+    xhr.onerror = () => reject();
+
+    xhr.send();
+  });
 
 const sendData = (body) =>
   new Promise((resolve, reject) => {
@@ -16,7 +26,7 @@ const sendData = (body) =>
 
     xhr.onload = () => {
       if (xhr.status === 200) {
-        resolve(xhr.response); // ← ВАЖНО
+        resolve(xhr.response);
       } else {
         reject();
       }
