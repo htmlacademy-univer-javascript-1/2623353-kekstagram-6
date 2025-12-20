@@ -14,15 +14,15 @@ const sendData = (body) =>
     const xhr = new XMLHttpRequest();
     xhr.open('POST', BASE_URL);
 
-    xhr.addEventListener('load', () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(xhr.response);
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        resolve(xhr.response); // ← ВАЖНО
       } else {
         reject();
       }
-    });
+    };
 
-    xhr.addEventListener('error', () => reject());
+    xhr.onerror = () => reject();
 
     xhr.send(body);
   });

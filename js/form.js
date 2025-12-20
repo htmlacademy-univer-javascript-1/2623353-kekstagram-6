@@ -208,13 +208,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(form);
       await sendData(formData);
 
-      closeForm();
       showMessage(successTemplate);
+      closeForm();
     } catch (error) {
-      showMessage(errorTemplate);
-    } finally {
       submitButton.disabled = false;
       submitButton.textContent = originalText;
+      showMessage(errorTemplate);
+      return;
     }
+
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+
   });
+
 });
