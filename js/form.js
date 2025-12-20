@@ -33,18 +33,23 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentMessageDocumentClick = null;
 
   function closeMessage() {
-    if (currentMessageElement) {
-      currentMessageElement.remove();
-      currentMessageElement = null;
-      body.classList.remove('has-message');
-
-      document.removeEventListener('keydown', onMessageKeydown);
-
-      if (currentMessageDocumentClick) {
-        document.removeEventListener('click', currentMessageDocumentClick);
-        currentMessageDocumentClick = null;
-      }
+    if (!currentMessageElement) {
+      return;
     }
+
+    currentMessageElement.remove();
+    currentMessageElement = null;
+    body.classList.remove('has-message');
+
+    document.removeEventListener('keydown', onMessageKeydown);
+
+    if (currentMessageDocumentClick) {
+      document.removeEventListener('click', currentMessageDocumentClick);
+      currentMessageDocumentClick = null;
+    }
+
+    overlay.classList.remove('hidden');
+    body.classList.add('modal-open');
   }
 
   function onMessageKeydown(evt) {
@@ -56,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showMessage(template) {
     closeMessage();
+
+    overlay.classList.add('hidden');
+    body.classList.remove('modal-open');
 
     const messageContent = template.content.cloneNode(true);
     const messageElement = messageContent.querySelector('.success, .error');
@@ -98,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
   function openForm() {
     overlay.classList.remove('hidden');
     body.classList.add('modal-open');
@@ -128,34 +135,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (hashtagsInput && commentInput) {
-    [hashtagsInput, commentInput].forEach((field) => {
-      field.addEventListener('keydown', (evt) => {
-        if (evt.key === 'Escape') {
-          evt.stopPropagation();
-        }
-      });
+  [hashtagsInput, commentInput].forEach((field) => {
+    field.addEventListener('keydown', (evt) => {
+      if (evt.key === 'Escape') {
+        evt.stopPropagation();
+      }
     });
-  }
+  });
+
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
-
     if (!file) {
       return;
     }
 
     const fileName = file.name.toLowerCase();
-    const isValidType = FILE_TYPES.some((type) =>
-      fileName.endsWith(type)
-    );
-
+    const isValidType = FILE_TYPES.some((type) => fileName.endsWith(type));
     if (!isValidType) {
       return;
     }
 
     const imageUrl = URL.createObjectURL(file);
-
     previewImage.src = imageUrl;
 
     effectPreviews.forEach((preview) => {
@@ -178,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     classTo: 'img-upload__field-wrapper',
     errorClass: 'img-upload__field-wrapper--invalid',
     errorTextParent: 'img-upload__field-wrapper',
-    errorTextClass: 'img-upload__error'
+    errorTextClass: 'img-upload__error',
   }, true);
 
   pristine.addValidator(
@@ -217,5 +218,4 @@ document.addEventListener('DOMContentLoaded', () => {
       submitButton.textContent = originalText;
     }
   });
-
 });
