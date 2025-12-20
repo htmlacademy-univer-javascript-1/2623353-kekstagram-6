@@ -81,8 +81,9 @@ const initFilters = () => {
 
 const showErrorMessage = () => {
   const errorContainer = document.createElement('div');
-  errorContainer.textContent = 'Не удалось загрузить данные. Пожалуйста, обновите страницу';
-  document.body.appendChild(errorContainer);
+  errorContainer.classList.add('data-error');
+  errorContainer.textContent = 'Ошибка загрузки данных';
+  document.body.append(errorContainer);
 };
 
 getData()
