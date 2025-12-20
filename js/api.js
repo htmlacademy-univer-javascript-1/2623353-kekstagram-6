@@ -22,7 +22,8 @@ const getData = () =>
 const sendData = (body) =>
   new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', BASE_URL);
+    xhr.responseType = 'json';
+    xhr.open('POST', `${BASE_URL}/`);
 
     xhr.onload = () => {
       if (xhr.status === 200) {
