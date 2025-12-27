@@ -1,23 +1,16 @@
-export const getRandomArrayElement = (elements) =>
-  elements[Math.floor(Math.random() * elements.length)];
+const ESCAPE_KEY = 'Escape';
 
-export const getRandomInteger = (min, max) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+const isEscapeKey = (evt) => evt.key === ESCAPE_KEY;
 
-export const createIdGenerator = () => {
-  let lastGeneratedId = 0;
+const debounce = (callback, timeoutDelay = 500) => {
+  let timeoutId;
 
-  return () => {
-    lastGeneratedId += 1;
-    return lastGeneratedId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      callback(...args);
+    }, timeoutDelay);
   };
 };
 
-export function debounce(callback, timeoutDelay = 500) {
-  let timeoutId;
-
-  return (...rest) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
-  };
-}
+export { debounce, isEscapeKey };

@@ -1,4 +1,4 @@
-import { openBigPicture } from './big-picture.js';
+import { bigPictureApi } from './big-picture.js';
 
 const template = document.querySelector('#picture');
 const container = document.querySelector('.pictures');
@@ -15,12 +15,10 @@ const createThumbnail = (photo) => {
   likes.textContent = photo.likes;
   comments.textContent = photo.comments.length;
 
-  thumb.dataset.id = photo.id;
-
   return thumb;
 };
 
-export function renderThumbnails(photos) {
+const renderThumbnails = (photos) => {
   const existingPictures = container.querySelectorAll('.picture');
   existingPictures.forEach((picture) => picture.remove());
 
@@ -31,11 +29,17 @@ export function renderThumbnails(photos) {
 
     thumb.addEventListener('click', (evt) => {
       evt.preventDefault();
-      openBigPicture(photo);
+      bigPictureApi.open(photo);
     });
 
     fragment.appendChild(thumb);
   });
 
   container.appendChild(fragment);
-}
+};
+
+const thumbnails = {
+  render: renderThumbnails
+};
+
+export { thumbnails };
