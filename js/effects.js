@@ -1,7 +1,9 @@
 const DEFAULT_EFFECT = 'none';
 
-const previewImage = document.querySelector('.img-upload__preview img');
-const effectsList = document.querySelector('.effects__list');
+const uploadOverlay = document.querySelector('.img-upload__overlay');
+
+const previewImage = uploadOverlay.querySelector('.img-upload__preview img');
+const effectsList = uploadOverlay.querySelector('.effects__list');
 const effectLevelContainer = document.querySelector('.img-upload__effect-level');
 const effectLevelSlider = document.querySelector('.effect-level__slider');
 const effectLevelValue = document.querySelector('.effect-level__value');
@@ -94,19 +96,11 @@ function initSlider() {
   noUiSlider.create(effectLevelSlider, {
     range: {
       min: 0,
-      max: 100
+      max: 100,
     },
     start: 100,
     step: 1,
     connect: 'lower',
-    format: {
-      to: function(value) {
-        return value;
-      },
-      from: function(value) {
-        return parseFloat(value);
-      }
-    }
   });
 
   effectLevelSlider.noUiSlider.on('update', (values) => {
@@ -165,7 +159,7 @@ function onEffectChange(evt) {
   }
 }
 
-export function resetEffects() {
+function resetEffects() {
   const noneRadio = document.querySelector('#effect-none');
   if (noneRadio) {
     noneRadio.checked = true;
@@ -184,7 +178,7 @@ export function resetEffects() {
   toggleSlider(false);
 }
 
-export function initEffects() {
+function initEffects() {
   initSlider();
 
   if (effectsList) {
@@ -193,3 +187,10 @@ export function initEffects() {
 
   resetEffects();
 }
+
+const effects = {
+  init: initEffects,
+  reset: resetEffects
+};
+
+export { effects };

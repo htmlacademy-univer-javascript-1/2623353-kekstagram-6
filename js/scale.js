@@ -5,12 +5,13 @@ const DEFAULT_SCALE = 100;
 
 let currentScale = DEFAULT_SCALE;
 
-const scaleControl = document.querySelector('.scale__control--value');
-const scaleSmaller = document.querySelector('.scale__control--smaller');
-const scaleBigger = document.querySelector('.scale__control--bigger');
-const previewImage = document.querySelector('.img-upload__preview img');
+let scaleContainer;
+let scaleControl;
+let scaleSmaller;
+let scaleBigger;
+let previewImage;
 
-function updateScale(value) {
+const updateScale = (value) => {
   currentScale = value;
 
   if (scaleControl) {
@@ -20,30 +21,33 @@ function updateScale(value) {
   if (previewImage) {
     previewImage.style.transform = `scale(${value / 100})`;
   }
-}
+};
 
-function onScaleSmallerClick() {
-  let newScale = currentScale - SCALE_STEP;
-  if (newScale < SCALE_MIN) {
-    newScale = SCALE_MIN;
-  }
-  updateScale(newScale);
-}
+const onScaleSmallerClick = () => {
+  updateScale(Math.max(currentScale - SCALE_STEP, SCALE_MIN));
+};
 
-function onScaleBiggerClick() {
-  let newScale = currentScale + SCALE_STEP;
-  if (newScale > SCALE_MAX) {
-    newScale = SCALE_MAX;
-  }
-  updateScale(newScale);
-}
+const onScaleBiggerClick = () => {
+  updateScale(Math.min(currentScale + SCALE_STEP, SCALE_MAX));
+};
 
-export function resetScale() {
+const resetScale = () => {
   updateScale(DEFAULT_SCALE);
-}
+};
 
-export function initScale() {
-  if (!scaleControl || !scaleSmaller || !scaleBigger || !previewImage) {
+const initScale = () => {
+  scaleContainer = document.querySelector('.scale');
+  previewImage = document.querySelector('.img-upload__preview img');
+
+  if (!scaleContainer || !previewImage) {
+    return;
+  }
+
+  scaleControl = scaleContainer.querySelector('.scale__control--value');
+  scaleSmaller = scaleContainer.querySelector('.scale__control--smaller');
+  scaleBigger = scaleContainer.querySelector('.scale__control--bigger');
+
+  if (!scaleControl || !scaleSmaller || !scaleBigger) {
     return;
   }
 
@@ -51,4 +55,11 @@ export function initScale() {
 
   scaleSmaller.addEventListener('click', onScaleSmallerClick);
   scaleBigger.addEventListener('click', onScaleBiggerClick);
-}
+};
+
+const scale = {
+  init: initScale,
+  reset: resetScale,
+};
+
+export { scale };

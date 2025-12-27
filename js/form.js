@@ -1,10 +1,14 @@
-import { validateHashtags, getHashtagErrorMessage } from './hashtags.js';
-import { initScale, resetScale } from './scale.js';
-import { initEffects, resetEffects } from './effects.js';
-import { sendData } from './api.js';
+import { hashtags } from './hashtags.js';
+import { scale } from './scale.js';
+import { effects } from './effects.js';
+import { api } from './api.js';
+import { isEscapeKey } from './util.js';
+
+const MAX_COMMENT_LENGTH = 140;
 
 let pristine;
 let isFormOpen = false;
+let isMessageOverForm = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('.img-upload__form');
@@ -41,29 +45,37 @@ document.addEventListener('DOMContentLoaded', () => {
     currentMessageElement = null;
     body.classList.remove('has-message');
 
+    if (isMessageOverForm && isFormOpen) {
+      overlay.classList.remove('hidden');
+      body.classList.add('modal-open');
+    }
+
+    isMessageOverForm = false;
+
     document.removeEventListener('keydown', onMessageKeydown);
 
     if (currentMessageDocumentClick) {
       document.removeEventListener('click', currentMessageDocumentClick);
       currentMessageDocumentClick = null;
     }
-
-    overlay.classList.remove('hidden');
-    body.classList.add('modal-open');
   }
 
   function onMessageKeydown(evt) {
-    if (evt.key === 'Escape') {
+    if (isEscapeKey(evt)) {
       evt.preventDefault();
       closeMessage();
     }
   }
 
-  function showMessage(template) {
+  function showMessage(template, overForm = false) {
     closeMessage();
 
-    overlay.classList.add('hidden');
-    body.classList.remove('modal-open');
+    isMessageOverForm = overForm;
+
+    if (overForm) {
+      overlay.classList.add('hidden');
+      body.classList.remove('modal-open');
+    }
 
     const messageContent = template.content.cloneNode(true);
     const messageElement = messageContent.querySelector('.success, .error');
@@ -92,6 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function onDocumentEscKey(evt) {
+    if (currentMessageElement) {
+      return;
+    }
+
     if (!isFormOpen) {
       return;
     }
@@ -100,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.activeElement === hashtagsInput ||
       document.activeElement === commentInput;
 
-    if (evt.key === 'Escape' && !isFocusInInput) {
+    if (isEscapeKey(evt) && !isFocusInInput) {
       evt.preventDefault();
       closeForm();
     }
@@ -113,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', onDocumentEscKey);
 
-    initScale();
-    initEffects();
+    scale.init();
+    effects.init();
   }
 
   function closeForm() {
@@ -124,8 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.removeEventListener('keydown', onDocumentEscKey);
 
-    resetScale();
-    resetEffects();
+    scale.reset();
+    effects.reset();
 
     form.reset();
     fileInput.value = '';
@@ -134,15 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
       pristine.reset();
     }
   }
-
-  [hashtagsInput, commentInput].forEach((field) => {
-    field.addEventListener('keydown', (evt) => {
-      if (evt.key === 'Escape') {
-        evt.stopPropagation();
-      }
-    });
-  });
-
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
@@ -184,13 +191,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   pristine.addValidator(
     hashtagsInput,
-    validateHashtags,
-    getHashtagErrorMessage
+    hashtags.validate,
+    hashtags.getErrorMessage
   );
 
   pristine.addValidator(
     commentInput,
-    (value) => value.length <= 140,
+    (value) => value.length <= MAX_COMMENT_LENGTH,
     'Комментарий не может быть длиннее 140 символов'
   );
 
@@ -207,12 +214,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const formData = new FormData(form);
-      await sendData(formData);
+      await api.sendData(formData);
 
       closeForm();
-      showMessage(successTemplate);
+      showMessage(successTemplate, false);
     } catch (error) {
-      showMessage(errorTemplate);
+      showMessage(errorTemplate, true);
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = originalText;

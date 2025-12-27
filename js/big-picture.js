@@ -1,3 +1,5 @@
+import { isEscapeKey } from './util.js';
+
 const bigPicture = document.querySelector('.big-picture');
 const body = document.body;
 
@@ -60,7 +62,7 @@ const renderComments = () => {
   }
 };
 
-export function openBigPicture(photo) {
+const openBigPicture = (photo) => {
   imgElement.src = photo.url;
   imgElement.alt = photo.description;
   likesCount.textContent = photo.likes;
@@ -85,17 +87,17 @@ export function openBigPicture(photo) {
   body.classList.add('modal-open');
 
   document.addEventListener('keydown', onEscKey);
-}
+};
 
-export function closeBigPicture() {
+const closeBigPicture = () => {
   bigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
 
   document.removeEventListener('keydown', onEscKey);
-}
+};
 
 function onEscKey(evt) {
-  if (evt.key === 'Escape') {
+  if (isEscapeKey(evt)) {
     evt.preventDefault();
     closeBigPicture();
   }
@@ -103,3 +105,10 @@ function onEscKey(evt) {
 
 closeButton.addEventListener('click', closeBigPicture);
 commentsLoader.addEventListener('click', renderComments);
+
+const bigPictureApi = {
+  open: openBigPicture,
+  close: closeBigPicture,
+};
+
+export { bigPictureApi };

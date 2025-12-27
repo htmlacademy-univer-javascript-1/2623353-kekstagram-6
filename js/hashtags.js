@@ -2,7 +2,7 @@ const MAX_HASHTAGS = 5;
 const MAX_HASHTAG_LENGTH = 20;
 const HASHTAG_REGEX = /^#[a-zа-яё0-9]+$/i;
 
-export function validateHashtags(value) {
+function validateHashtags(value) {
   if (!value.trim()) {
     return true;
   }
@@ -27,7 +27,7 @@ export function validateHashtags(value) {
   );
 }
 
-export function getHashtagErrorMessage(value) {
+function getHashtagErrorMessage(value) {
   const tags = value.trim().split(/\s+/);
 
   if (tags.length > MAX_HASHTAGS) {
@@ -54,3 +54,10 @@ export function getHashtagErrorMessage(value) {
 
   return 'Ошибка в хэш-тегах';
 }
+
+const hashtags = {
+  validate: validateHashtags,
+  getErrorMessage: getHashtagErrorMessage
+};
+
+export { hashtags };
